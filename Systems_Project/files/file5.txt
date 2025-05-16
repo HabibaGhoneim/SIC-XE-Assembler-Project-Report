@@ -1,0 +1,59 @@
+0001 COPY    START   0       . Begin program at location 0
+0003 FIRST   STL     RETADR  . Save return address
+0004         LDB     #LENGTH . Load base register with length
+0005         BASE    LENGTH  . Tell assembler LENGTH is base relative
+0006 
+0007 CLOOP   +JSUB   RDREC   . Read record (format 4 subroutine call)
+0008         LDA     LENGTH  . Load record length
+0009         COMP    #0      . Compare length to 0
+0010         JEQ     ENDFIL  . If end of file, jump to EOF handler
+0011         +JSUB   WRREC   . Write record (format 4 subroutine call)
+0012         J       CLOOP   . Loop back to read next record
+0013 
+0014 ENDFIL  LDA     EOF     . Load EOF marker
+0015         STA     BUFFER  . Store in buffer
+0016         LDA     #3      . Set length = 3 (EOF size)
+0017         STA     LENGTH  . Store length
+0018         +JSUB   WRREC   . Write EOF record
+0019         J       @RETADR . Return to OS (indirect jump)
+0020 
+0021 EOF     BYTE    C'EOF'  . EOF marker constant
+0022 RETADR  RESW    1       . Return address storage
+0023 LENGTH  RESW    1       . Length of record storage
+0024 BUFFER  RESB    4096    . Data buffer (4096 bytes)
+0025 
+0026 . Subroutine to read record into buffer
+0027 RDREC   CLEAR   X       . Clear index register
+0028         CLEAR   A       . Clear accumulator
+0029         CLEAR   S       . Clear register S
+0030         +LDT    #4096   . Set max length (format 4)
+0031 
+0032 RLOOP   TD      INPUT   . Test input device
+0033         JEQ     RLOOP   . Loop until ready
+0034         RD      INPUT   . Read character
+0035         COMPR   A,S     . Compare to max length
+0036         JEQ     EXIT    . Exit if buffer full
+0037         STCH    BUFFER,X . Store character in buffer
+0038         TIXR    T       . Increment index
+0039         JLT     RLOOP   . Loop if more space
+0040 
+0041 EXIT    STX     LENGTH  . Store actual length
+0042         RSUB            . Return from subroutine
+0043 
+0044 INPUT   BYTE    X'F1'   . Input device code
+0045 
+0046 . Subroutine to write record from buffer
+0047 WRREC   CLEAR   X       . Clear index register
+0048         LDT     LENGTH  . Load record length
+0049 
+0050 WLOOP   TD      OUTPUT  . Test output device
+0051         JEQ     WLOOP   . Loop until ready
+0052         LDCH    BUFFER,X . Get character from buffer
+0053         WD      OUTPUT  . Write character
+0054         TIXR    T       . Increment index
+0055         JLT     WLOOP   . Loop if more to write
+0056         RSUB            . Return from subroutine
+0057 
+0058 OUTPUT  BYTE    X'05'   . Output device code
+0059 
+0060         END     FIRST   . End of program

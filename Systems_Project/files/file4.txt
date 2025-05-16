@@ -1,0 +1,18 @@
+1     SUM     START   4000         . Program starts at address 4000
+2     FIRST   +LDX    #0           . Initialize index register X to 0 (Format 4)
+3             LDA     #0           . Initialize accumulator A to 0
+4             STA     TOTAL        . Clear TOTAL storage
+5             BASE    TABLE        . Tell assembler TABLE is base relative
+6    
+7     LOOP    +ADD    TABLE,X      . Add TABLE element to accumulator (Format 4)
+8             TIX     COUNT        . Increment X, compare to COUNT
+9             JLT     LOOP         . Loop if X < COUNT
+10            STA     TOTAL        . Store final sum in TOTAL
+11            +RSUB               . Return to OS (Format 4)
+12    
+13    . Data Section
+14    TABLE   RESW    100          . Array of 100 words (values 1-100)
+15    COUNT   WORD    100          . Number of elements in TABLE
+16    TOTAL   RESW    1            . Will contain sum of TABLE elements
+17    
+18            END     FIRST        . Program ends at FIRST

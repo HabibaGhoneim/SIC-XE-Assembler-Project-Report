@@ -1,0 +1,21 @@
+1 COPY     START   0
+2 FIRST    STL     RETADR
+3         LDB     #LENGTH
+4        BASE    LENGTH
+6         LDA     LENGTH
+7         COMP    #0
+8        JEQ     ENDFIL
+9         +JSUB   ENDFIL
+10        J       CLOOP
+11 ENDFIL   LDA     EOF
+12         STA     BUFFER
+13         LDA     #3
+14         STA     LENGTH
+15         +JSUB   ENDFIL
+16         J       @RETADR
+17         CLEAR   X
+23          RSUB
+18 EOF      BYTE    C'EOF'
+18 RETADR   RESW    1
+19 LENGTH   RESW    1
+20 BUFFER   RESB    4096

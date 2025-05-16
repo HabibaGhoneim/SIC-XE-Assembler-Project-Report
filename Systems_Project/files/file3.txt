@@ -1,0 +1,17 @@
+.here is a comment
+        COPY    START   0       . program starts at address 0
+FIRST   LDA     LENGTH  . A ← LENGTH
+SECOND  STA     RESULT  . store result here
+THIRD   +ADD    @VALUE  .format 4 add, indirect addressing
+FOURTH  LDA     #1      . immediate addressing
+FIFTH   TIXR    X       .format 2: increment X
+SIXTH   COMPR   A,X     . format 2: compare A and X
+LABEL   SUB     COUNT   . subtract counter
+        +RSUB          . format 4: return to caller
+        BASE    LENGTH . establish base relative on LENGTH
+LENGTH  WORD    5       . define symbol LENGTH = 5
+RESULT  RESW    1       . reserve one word for RESULT
+VALUE   WORD    10      . define symbol VALUE = 10
+COUNT   WORD    1       . define symbol COUNT = 1
+        END     FIRST   . program entry point = FIRST
+
